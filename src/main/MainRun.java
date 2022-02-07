@@ -28,7 +28,7 @@ public class MainRun {
     private static final DrivingTimeSheetSorterAndCalculator sortDrivingTable = new DrivingTimeSheetSorterAndCalculator();
 
     public static void main(String[] args) {
-        System.out.println("Program is initializing ....");
+        System.out.println("Program is running");
         init();
         System.out.println("Program is ready!");
         menu();
