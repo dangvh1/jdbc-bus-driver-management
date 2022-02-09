@@ -13,7 +13,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RouteDAO {
+public class BuslineDAO {
     public static final String ROUTE_TABLE_NAME = "bus_line";
 
     public static final String ID = "id";

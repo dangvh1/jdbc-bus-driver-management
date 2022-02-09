@@ -1,8 +1,8 @@
 package repository;
 
 import constant.DatabaseConstant;
-import drivertimesheet.Driving;
-import drivertimesheet.DrivingTimeSheet;
+import drivingManagement.BuslineList;
+import drivingManagement.DriverAssignment;
 import entity.BusLine;
 import entity.Driver;
 import util.CollectionUtil;
@@ -23,7 +23,7 @@ public class DrivingDAO {
 
     private static final String DRIVER_ID = "driver_id";
     private static final String ROUTE_ID = "bus_line_id";
-    private static final String ROUND_TRIP_NUMBER = "round_trip_number";
+    private static final String DRIVING_TURN_NUMBER = "driving_turn_number";
 
     public static final Connection connection;
 
@@ -31,13 +31,13 @@ public class DrivingDAO {
         connection = DatabaseConnection.openConnection(DatabaseConstant.DRIVER_STRING, DatabaseConstant.URL, DatabaseConstant.USERNAME, DatabaseConstant.PASSWORD);
     }
 
-    public List<Driving> getDrivingTimeSheet() {
-        List<Driving> drivings = null;
+    public List<DriverAssignment> getDrivingTimeSheet() {
+        List<DriverAssignment> drivings = null;
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
         try {
-            String query = "select d.id driver_id, d.name, d.address, d.phone_number, d.driver_level, bl.id bus_line_id, bl.distance, bl.bus_stop_number, da.round_trip_number " +
-                    "from " + DRIVING_TABLE_NAME + " da join " + DriverDAO.DRIVER_TABLE_NAME + " d on da.driver_Id = d.id join " + RouteDAO.ROUTE_TABLE_NAME + " bl on da.bus_line_id = bl.id";
+            String query = "select d.id driver_id, d.name, d.address, d.phone_number, d.driver_level, bl.id bus_line_id, bl.distance, bl.bus_stop_number, da.driving_turn_number " +
+                    "from " + DRIVING_TABLE_NAME + " da join " + DriverDAO.DRIVER_TABLE_NAME + " d on da.driver_Id = d.id join " + BuslineDAO.ROUTE_TABLE_NAME + " bl on da.bus_line_id = bl.id";
             preparedStatement = connection.prepareStatement(query);
             resultSet = preparedStatement.executeQuery();
             drivings = new ArrayList<>();
@@ -50,22 +50,22 @@ public class DrivingDAO {
                 Driver driver = new Driver(driverID, name, address, phoneNumber, level);
 
                 int routeID = resultSet.getInt(ROUTE_ID);
-                float range = resultSet.getFloat(RouteDAO.RANGE);
-                int stopNumber = resultSet.getInt(RouteDAO.STOP_NUMBER);
+                float range = resultSet.getFloat(BuslineDAO.RANGE);
+                int stopNumber = resultSet.getInt(BuslineDAO.STOP_NUMBER);
                 BusLine busLine = new BusLine(routeID, range, stopNumber);
 
-                int turn = resultSet.getInt(ROUND_TRIP_NUMBER);
+                int turn = resultSet.getInt(DRIVING_TURN_NUMBER);
 
-                DrivingTimeSheet drivingTimeSheet = new DrivingTimeSheet(busLine, turn);
+                BuslineList buslineList = new BuslineList(busLine, turn);
 
-                Driving tempDriving = searchDriver(drivings, driverID);
+                DriverAssignment driverAssignment = searchDriver(drivings, driverID);
 
-                if (ObjectUtil.isEmpty(tempDriving)) {
-                    Driving driving = new Driving(driver, Arrays.asList(drivingTimeSheet));
+                if (ObjectUtil.isEmpty(driverAssignment)) {
+                    DriverAssignment driving = new DriverAssignment(driver, Arrays.asList(buslineList));
                     drivings.add(driving);
                 } else {
-                    int index = drivings.indexOf(tempDriving);
-                    drivings.get(index).getDrivingTimeSheets().add(drivingTimeSheet);
+                    int index = drivings.indexOf(driverAssignment);
+                    drivings.get(index).getBusLineLists().add(buslineList);
                 }
             }
         } catch (SQLException throwables) {
@@ -76,28 +76,28 @@ public class DrivingDAO {
         return drivings;
     }
 
-    private Driving searchDriver(List<Driving> drivings, int driverId) {
+    private DriverAssignment searchDriver(List<DriverAssignment> drivings, int driverId) {
 
-        List<Driving> collect = drivings.stream().filter(driving -> driving.getDriver().getId() == driverId).collect(Collectors.toList());
+        List<DriverAssignment> collect = drivings.stream().filter(driving -> driving.getDriver().getId() == driverId).collect(Collectors.toList());
         if (!CollectionUtil.isEmpty(collect)) {
             collect.get(0);
         }
         return null;
     }
 
-    public void insertNewDriving(Driving driving) {
+    public void insertNewDriving(DriverAssignment driving) {
         if (ObjectUtil.isEmpty(driving)) {
             return;
         }
         int driverID = driving.getDriver().getId();
-        driving.getDrivingTimeSheets().forEach(timesheet -> {
+        driving.getBusLineLists().forEach(timesheet -> {
             PreparedStatement preparedStatement = null;
             try {
                 String query = "INSERT INTO " + DRIVING_TABLE_NAME + " VALUES (?, ?, ?)";
                 preparedStatement = connection.prepareStatement(query);
                 preparedStatement.setInt(1, driverID);
                 preparedStatement.setInt(2, timesheet.getRoute().getId());
-                preparedStatement.setInt(3, timesheet.getRoundTripNumber());
+                preparedStatement.setInt(3, timesheet.getDrivingTurnNumber());
                 preparedStatement.executeUpdate();
             } catch (SQLException ex) {
                 ex.printStackTrace();
@@ -107,7 +107,7 @@ public class DrivingDAO {
         });
     }
 
-    public void insertNewDrivingTimeSheet(List<Driving> drivings) {
+    public void insertNewDrivingTimeSheet(List<DriverAssignment> drivings) {
         if (CollectionUtil.isEmpty(drivings)) {
             return;
         }

@@ -1,11 +1,11 @@
 package main;
 
-import drivertimesheet.Driving;
+import drivingManagement.DriverAssignment;
 import entity.BusLine;
 import entity.Driver;
 import repository.DriverDAO;
 import repository.DrivingDAO;
-import repository.RouteDAO;
+import repository.BuslineDAO;
 import util.CollectionUtil;
 
 import java.util.ArrayList;
@@ -16,16 +16,18 @@ import java.util.Scanner;
 public class MainRun {
     public static List<Driver> drivers = new ArrayList<>();
     public static List<BusLine> busLines = new ArrayList<>();
-    public static List<Driving> drivings = new ArrayList<>();
+    public static List<DriverAssignment> drivings = new ArrayList<>();
+    public static List<Integer> checkDriverID = new ArrayList<>();
+    public static List<Integer> checkBusLineID = new ArrayList<>();
 
     public static final DriverDAO driverDAO = new DriverDAO();
-    public static final RouteDAO routeDAO = new RouteDAO();
+    public static final BuslineDAO buslineDAO = new BuslineDAO();
     public static final DrivingDAO drivingDAO = new DrivingDAO();
 
     private static final DriverService driverService = new DriverService();
     private static final BusLineService busLineService = new BusLineService();
-    private static final DrivingTimeSheetCreator drivingTimeSheetCreator = new DrivingTimeSheetCreator();
-    private static final DrivingTimeSheetSorterAndCalculator sortDrivingTable = new DrivingTimeSheetSorterAndCalculator();
+    private static final DriveAssignmentService driveAssignmentService = new DriveAssignmentService();
+    private static final SortandDistance sortandDistance = new SortandDistance();
 
     public static void main(String[] args) {
         System.out.println("Program is running");
@@ -47,14 +49,14 @@ public class MainRun {
                     printRoute();
                     break;
                 case 3:
-                    drivingTimeSheetCreator.createDrivingTable();
+                    driveAssignmentService.createDrivingTable();
                     printDriving();
                     break;
                 case 4:
-                    sortDrivingTable.sortDrivingTable();
+                    sortandDistance.sortDrivingTable();
                     break;
                 case 5:
-                    sortDrivingTable.distanceDriving();
+                    sortandDistance.distanceDriving();
                     break;
                 case 6:
                     System.exit(0);
@@ -70,7 +72,7 @@ public class MainRun {
             drivers.sort(Comparator.comparing(Driver::getId));
             Driver.AUTO_ID = drivers.get(drivers.size() - 1).getId() + 1;
         }
-        busLines = !CollectionUtil.isEmpty(routeDAO.getRoute()) ? routeDAO.getRoute() : new ArrayList<>();
+        busLines = !CollectionUtil.isEmpty(buslineDAO.getRoute()) ? buslineDAO.getRoute() : new ArrayList<>();
         if (CollectionUtil.isEmpty(busLines)) {
             BusLine.AUTO_ID = 100;
         } else {

@@ -1,5 +1,6 @@
 package main;
 
+import drivingManagement.DriverAssignment;
 import util.CollectionUtil;
 
 import java.util.ArrayList;
@@ -7,7 +8,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Scanner;
 
-public class DrivingTimeSheetSorterAndCalculator {
+public class SortandDistance {
     public void sortDrivingTable() {
         if (CollectionUtil.isEmpty(MainRun.drivings)) {
             System.out.println("Nhập bảng phân công trước khi sắp xếp");
@@ -40,7 +41,7 @@ public class DrivingTimeSheetSorterAndCalculator {
                     sortByDriverName();
                     break;
                 case 2:
-                    sortByRouteNumber();
+                    sortByBusLineNumber();
                     break;
                 case 3:
                     return;
@@ -49,13 +50,35 @@ public class DrivingTimeSheetSorterAndCalculator {
     }
 
     public void sortByDriverName() {
-        MainRun.drivings.sort(Comparator.comparing(driving -> driving.getDriver().getName()));
-        MainRun.printDriving();
+        for (int i = 0; i < MainRun.drivings.size(); i++) {
+            for (int j = i + 1; j < MainRun.drivings.size(); j++) {
+                if (MainRun.drivings.get(i).getDriver().getName().compareTo(MainRun.drivings.get(j).getDriver().getName()) > 0) {
+                    DriverAssignment tmp = MainRun.drivings.get(i);
+                    MainRun.drivings.set(i, MainRun.drivings.get(j));
+                    MainRun.drivings.set(j, tmp);
+                }
+            }
+        }
+        for (DriverAssignment driverAssignment : MainRun.drivings) {
+            System.out.println(driverAssignment);
+        }
+
     }
 
-    public void sortByRouteNumber() {
-        MainRun.drivings.sort((o1, o2) -> o1.getTotalBusLineNumber() < o2.getTotalBusLineNumber() ? 1 : -1);
-        MainRun.printDriving();
+    public void sortByBusLineNumber() {
+        for (int i = 0; i < MainRun.drivings.size(); i++) {
+            for (int j = i + 1; j < MainRun.drivings.size(); j++) {
+                if (MainRun.drivings.get(i).getBusLineSum() < MainRun.drivings.get(j).getBusLineSum()) {
+                    DriverAssignment tmp = MainRun.drivings.get(i);
+                    MainRun.drivings.set(i, MainRun.drivings.get(j));
+                    MainRun.drivings.set(j, tmp);
+                }
+            }
+        }
+        for (DriverAssignment driverAssignment : MainRun.drivings) {
+            System.out.println(driverAssignment);
+        }
+
     }
 
     public void distanceDriving() {
@@ -66,16 +89,16 @@ public class DrivingTimeSheetSorterAndCalculator {
         for (int i = 0; i < MainRun.drivings.size()-1; i++) {
             System.out.println("-------Tính tổng khoảng cách cho lái xe " + MainRun.drivers.get(i).getName() + "--------");
             List<Float> distanceTotal = new ArrayList<>();
-            for (int j = 0; j < MainRun.drivings.get(i).getDrivingTimeSheets().size(); j++) {
-                float tmp = MainRun.drivings.get(i).getDrivingTimeSheets().get(j).getRoute().getDistance() *
-                        MainRun.drivings.get(i).getDrivingTimeSheets().get(j).getRoundTripNumber();
+            for (int j = 0; j < MainRun.drivings.get(i).getBusLineLists().size(); j++) {
+                float tmp = MainRun.drivings.get(i).getBusLineLists().get(j).getRoute().getDistance() *
+                        MainRun.drivings.get(i).getBusLineLists().get(j).getDrivingTurnNumber();
                 distanceTotal.add(tmp);
             }
             int tempTotal = 0;
             for (Float aFloat : distanceTotal) {
                 tempTotal += aFloat;
             }
-            MainRun.drivings.get(i).setTotalDistance(tempTotal);
+            MainRun.drivings.get(i).setDistanceSum(tempTotal);
             System.out.println(tempTotal);
         }
     }

@@ -9,30 +9,30 @@ import java.util.Scanner;
 public class BusLineService {
     public void createNewBusLine(){
         System.out.println("Nhập số lượng tuyến muốn thêm mới: ");
-        int routeQuantity = 0;
-        boolean isValidRouteQuantity = true;
+        int countBusLine = 0;
+        boolean check = true;
         do {
             try {
-                routeQuantity = new Scanner(System.in).nextInt();
-                isValidRouteQuantity = true;
+                countBusLine = new Scanner(System.in).nextInt();
+                check = true;
             } catch (Exception e) {
                 System.out.println("Không được nhập ký tự khác ngoài số! Nhập lại: ");
-                isValidRouteQuantity = false;
+                check = false;
                 continue;
             }
-            if (routeQuantity <= 0) {
+            if (countBusLine <= 0) {
                 System.out.print("Số lượng tuyến đường không được nhỏ hơn 0! Nhập lại: ");
-                isValidRouteQuantity = false;
+                check = false;
             }
-        } while (!isValidRouteQuantity);
+        } while (!check);
 
         List<BusLine> tempBusLine = new ArrayList<>();
-        for (int i = 0; i < routeQuantity; i++) {
+        for (int i = 0; i < countBusLine; i++) {
             BusLine busLine = new BusLine();
             busLine.inputInfo();
             tempBusLine.add(busLine);
         }
         MainRun.busLines.addAll(tempBusLine);
-        MainRun.routeDAO.insertNewRoute(tempBusLine);
+        MainRun.buslineDAO.insertNewRoute(tempBusLine);
     }
 }

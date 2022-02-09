@@ -10,25 +10,25 @@ public class  DriverService {
 
     public void createNewDriver() {
         System.out.println("Nhập số lượng lái xe muốn thêm mới: ");
-        int driverQuantity = 0;
-        boolean isValidDriverQuantity = true;
+        int countDriver = 0;
+        boolean check = true;
         do {
             try {
-                driverQuantity = new Scanner(System.in).nextInt();
-                isValidDriverQuantity = true;
+                countDriver = new Scanner(System.in).nextInt();
+                check = true;
             } catch (Exception e) {
                 System.out.println("Không được nhập ký tự khác ngoài số! Nhập lại: ");
-                isValidDriverQuantity = false;
+                check = false;
                 continue;
             }
-            if (driverQuantity <= 0) {
+            if (countDriver <= 0) {
                 System.out.print("Số lượng lái xe không được nhỏ hơn 0! Nhập lại: ");
-                isValidDriverQuantity = false;
+                check = false;
             }
-        } while (!isValidDriverQuantity);
+        } while (!check);
 
         List<Driver> tempDriver = new ArrayList<>();
-        for (int i = 0; i < driverQuantity; i++) {
+        for (int i = 0; i < countDriver; i++) {
             Driver driver = new Driver();
             driver.inputInfo();
             tempDriver.add(driver);
