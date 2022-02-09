@@ -13,9 +13,6 @@ import java.util.Scanner;
 
 public class DriveAssignmentService {
 
-    public static boolean isEmpty(Object obj) {
-        return obj == null;
-    }
 
     public boolean isValidDiverAndBusLine() {
         return !CollectionUtil.isEmpty(MainRun.drivers) && !CollectionUtil.isEmpty(MainRun.busLines);
@@ -129,7 +126,7 @@ public class DriveAssignmentService {
                 continue;
             }
             driver = searchDriverId(tmpID);
-            if (isEmpty(driver)) {
+            if (ObjectUtil.isEmpty(driver)) {
                 System.out.print("Không có id lái xe vừa nhập! Nhập lại: ");
                 check = false;
             }
@@ -162,7 +159,7 @@ public class DriveAssignmentService {
                 continue;
             }
             busLine = searchRouteId(tmpID);
-            if (isEmpty(busLine)) {
+            if (ObjectUtil.isEmpty(busLine)) {
                 System.out.print("Không có id tuyến đường vừa nhập! Nhập lại: ");
                 check = false;
             }
